@@ -1,4 +1,4 @@
-// PicoArt v25 - Style Transfer API (FLUX Depth + AI Selection)
+// PicoArt v30 - Style Transfer API (FLUX Depth + AI Selection + Debug)
 import { MODEL_CONFIG } from './modelConfig';
 
 // File to Base64 conversion
@@ -157,6 +157,20 @@ export const processStyleTransfer = async (photoFile, selectedStyle, apiKey, onP
     // 4. Poll for result
     const result = await pollPrediction(prediction.id, modelConfig, onProgress);
 
+    // ========== 디버깅 로그 추가 ==========
+    console.log('');
+    console.log('========================================');
+    console.log('🔍 API RESPONSE DEBUG (v30)');
+    console.log('========================================');
+    console.log('📦 Full Result Object:', result);
+    console.log('📋 All Keys:', Object.keys(result));
+    console.log('🎨 selected_artist:', result.selected_artist);
+    console.log('🎨 selectedArtist:', result.selectedArtist);
+    console.log('🎨 artist:', result.artist);
+    console.log('🎨 aiSelectedArtist:', result.aiSelectedArtist);
+    console.log('========================================');
+    console.log('');
+
     if (result.status !== 'succeeded') {
       throw new Error('Processing did not succeed');
     }
@@ -175,6 +189,15 @@ export const processStyleTransfer = async (photoFile, selectedStyle, apiKey, onP
     const blob = await imageResponse.blob();
     const localUrl = URL.createObjectURL(blob);
 
+    // ========== AI 선택 정보 추출 (다양한 키 시도) ==========
+    const aiSelectedArtist = result.selected_artist 
+                          || result.selectedArtist 
+                          || result.artist 
+                          || result.aiSelectedArtist
+                          || null;
+
+    console.log('✅ Final aiSelectedArtist:', aiSelectedArtist);
+
     return {
       success: true,
       resultUrl: localUrl,
@@ -184,9 +207,9 @@ export const processStyleTransfer = async (photoFile, selectedStyle, apiKey, onP
       cost: modelConfig.cost,
       time: modelConfig.time,
       // AI 선택 정보 추가
-      aiSelectedArtist: result.selected_artist,
-      selectionMethod: result.selection_method,
-      selectionDetails: result.selection_details
+      aiSelectedArtist: aiSelectedArtist,
+      selectionMethod: result.selection_method || result.selectionMethod,
+      selectionDetails: result.selection_details || result.selectionDetails
     };
 
   } catch (error) {
