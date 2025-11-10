@@ -1,4 +1,4 @@
-// PicoArt v25 - Main App (동양화 단순화 버전)
+// PicoArt v30 - Main App (aiSelectedArtist 전달 수정)
 import React, { useState } from 'react';
 import UploadScreen from './components/UploadScreen';
 import StyleSelection from './components/StyleSelection';
@@ -6,37 +6,54 @@ import ProcessingScreen from './components/ProcessingScreen';
 import ResultScreen from './components/ResultScreen';
 import './styles/App.css';
 
+
 const App = () => {
   const [currentScreen, setCurrentScreen] = useState('upload');
   const [uploadedPhoto, setUploadedPhoto] = useState(null);
   const [selectedStyle, setSelectedStyle] = useState(null);
   const [resultImage, setResultImage] = useState(null);
+  const [aiSelectedArtist, setAiSelectedArtist] = useState(null); // ✅ AI 선택 화가 추가
 
-  // Handler: Photo uploaded
+
+  // ========== Handler: Photo uploaded ==========
   const handlePhotoUpload = (photoFile) => {
     setUploadedPhoto(photoFile);
     setCurrentScreen('style');
   };
 
-  // Handler: Style selected
+
+  // ========== Handler: Style selected ==========
   const handleStyleSelect = (style) => {
     setSelectedStyle(style);
     setCurrentScreen('processing');
   };
 
-  // Handler: Processing complete
-  const handleProcessingComplete = (style, resultImageUrl) => {
+
+  // ========== Handler: Processing complete ==========
+  const handleProcessingComplete = (style, resultImageUrl, result) => {
     setResultImage(resultImageUrl);
+    
+    // ✅ AI 선택 화가 정보 저장
+    if (result && result.aiSelectedArtist) {
+      setAiSelectedArtist(result.aiSelectedArtist);
+      console.log('✅ App.jsx received aiSelectedArtist:', result.aiSelectedArtist);
+    } else {
+      console.log('⚠️ No aiSelectedArtist in result:', result);
+    }
+    
     setCurrentScreen('result');
   };
 
-  // Handler: Reset to start
+
+  // ========== Handler: Reset to start ==========
   const handleReset = () => {
     setCurrentScreen('upload');
     setUploadedPhoto(null);
     setSelectedStyle(null);
     setResultImage(null);
+    setAiSelectedArtist(null); // ✅ AI 선택 초기화
   };
+
 
   return (
     <div className="app">
@@ -46,13 +63,14 @@ const App = () => {
           <div className="header-content">
             <h1 className="app-title">🎨 PicoArt</h1>
             <p className="app-tagline">AI가 당신의 사진을 거장의 그림으로</p>
-            <p className="app-version">v25 - 동양화 단순화 (한국 민화, 중국 수묵/공필, 일본 우키요에)</p>
+            <p className="app-version">v30 - 동양화 6개 장르 지원 + 디버깅 강화</p>
           </div>
         </header>
       )}
 
       {/* Main Content */}
       <main className="app-main">
+        
         {currentScreen === 'upload' && (
           <UploadScreen onUpload={handlePhotoUpload} />
         )}
@@ -74,9 +92,11 @@ const App = () => {
             originalPhoto={uploadedPhoto}
             resultImage={resultImage}
             selectedStyle={selectedStyle}
+            aiSelectedArtist={aiSelectedArtist}
             onReset={handleReset}
           />
         )}
+        
       </main>
 
       {/* Footer */}
