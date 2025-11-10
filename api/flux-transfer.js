@@ -556,14 +556,31 @@ export default async function handler(req, res) {
 
     const data = await response.json();
     console.log('✅ FLUX Depth completed');
+    console.log('📤 Returning prediction with AI info:', {
+      id: data.id,
+      artist: selectedArtist,
+      method: selectionMethod
+    });
     
-    // 결과에 선택 정보 포함
+    // ========== v30: AI 선택 정보를 첫 응답에 명확히 포함 ==========
+    // 프론트엔드가 이 정보를 저장해서 나중에 사용함
     res.status(200).json({
-      ...data,
+      id: data.id,
+      status: data.status,
+      // ✅ AI 선택 정보 (반드시 포함!)
       selected_artist: selectedArtist,
       selection_method: selectionMethod,
       selection_details: selectionDetails
     });
+    
+  } catch (error) {
+    console.error('Handler error:', error);
+    res.status(500).json({ 
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
+  }
+}
     
   } catch (error) {
     console.error('Handler error:', error);

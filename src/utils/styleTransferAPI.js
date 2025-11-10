@@ -1,7 +1,6 @@
-// PicoArt v30 - Style Transfer API (FLUX Depth + AI Selection + Debug)
+// PicoArt v30 - Style Transfer API (첫 응답에서 AI 정보 저장)
 import { MODEL_CONFIG } from './modelConfig';
 
-// File to Base64 conversion
 const fileToBase64 = async (file) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -11,7 +10,6 @@ const fileToBase64 = async (file) => {
   });
 };
 
-// Image resizing
 const resizeImage = async (file, maxWidth = 1024) => {
   return new Promise((resolve) => {
     const img = new Image();
@@ -40,16 +38,13 @@ const resizeImage = async (file, maxWidth = 1024) => {
   });
 };
 
-// Sleep utility
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// Get model configuration based on style
 const getModelForStyle = (style) => {
-  const model = style.model || 'SDXL'; // Default to SDXL
+  const model = style.model || 'SDXL';
   return MODEL_CONFIG[model];
 };
 
-// FLUX ControlNet API call
 const callFluxAPI = async (photoBase64, stylePrompt, onProgress) => {
   if (onProgress) onProgress('FLUX 고품질 변환 시작...');
 
@@ -75,7 +70,6 @@ const callFluxAPI = async (photoBase64, stylePrompt, onProgress) => {
   return response.json();
 };
 
-// FLUX Depth + AI Selection API call
 const callFluxWithAI = async (photoBase64, selectedStyle, onProgress) => {
   if (onProgress) onProgress('AI 자동 화가 선택 시작...');
 
@@ -97,10 +91,9 @@ const callFluxWithAI = async (photoBase64, selectedStyle, onProgress) => {
   return response.json();
 };
 
-// Poll for prediction result
 const pollPrediction = async (predictionId, modelConfig, onProgress) => {
   let attempts = 0;
-  const maxAttempts = 90; // 3 minutes max
+  const maxAttempts = 90;
   
   while (attempts < maxAttempts) {
     await sleep(2000);
@@ -122,7 +115,6 @@ const pollPrediction = async (predictionId, modelConfig, onProgress) => {
       throw new Error('Processing failed');
     }
 
-    // Update progress
     if (onProgress) {
       const progress = Math.min(95, 10 + (attempts * 1.0));
       onProgress(`변환 중... ${Math.floor(progress)}%`);
@@ -132,21 +124,16 @@ const pollPrediction = async (predictionId, modelConfig, onProgress) => {
   throw new Error('Processing timeout');
 };
 
-// Main style transfer function with hybrid model support
 export const processStyleTransfer = async (photoFile, selectedStyle, apiKey, onProgress) => {
   try {
-    // 1. Resize image
     const resizedPhoto = await resizeImage(photoFile, 1024);
     const photoBase64 = await fileToBase64(resizedPhoto);
-
-    // 2. Get model configuration
     const modelConfig = getModelForStyle(selectedStyle);
     
     if (onProgress) {
       onProgress(`${modelConfig.label} 모델 준비 중...`);
     }
 
-    // 3. Call appropriate API based on model
     let prediction;
     if (modelConfig.model.includes('flux')) {
       prediction = await callFluxAPI(photoBase64, selectedStyle.prompt, onProgress);
@@ -154,20 +141,31 @@ export const processStyleTransfer = async (photoFile, selectedStyle, apiKey, onP
       prediction = await callFluxWithAI(photoBase64, selectedStyle, onProgress);
     }
 
-    // 4. Poll for result
-    const result = await pollPrediction(prediction.id, modelConfig, onProgress);
-
-    // ========== 디버깅 로그 추가 ==========
+    // ========== v30: 첫 응답에서 AI 선택 정보 저장 ==========
     console.log('');
     console.log('========================================');
-    console.log('🔍 API RESPONSE DEBUG (v30)');
+    console.log('🎯 FIRST RESPONSE (AI SELECTION INFO)');
     console.log('========================================');
-    console.log('📦 Full Result Object:', result);
-    console.log('📋 All Keys:', Object.keys(result));
+    console.log('📦 prediction:', prediction);
+    console.log('🎨 selected_artist:', prediction.selected_artist);
+    console.log('🎨 selection_method:', prediction.selection_method);
+    console.log('========================================');
+    console.log('');
+
+    const aiSelectionInfo = {
+      artist: prediction.selected_artist || null,
+      method: prediction.selection_method || null,
+      details: prediction.selection_details || null
+    };
+
+    const result = await pollPrediction(prediction.id, modelConfig, onProgress);
+
+    console.log('');
+    console.log('========================================');
+    console.log('🔍 POLLING RESPONSE (for comparison)');
+    console.log('========================================');
+    console.log('📦 result keys:', Object.keys(result));
     console.log('🎨 selected_artist:', result.selected_artist);
-    console.log('🎨 selectedArtist:', result.selectedArtist);
-    console.log('🎨 artist:', result.artist);
-    console.log('🎨 aiSelectedArtist:', result.aiSelectedArtist);
     console.log('========================================');
     console.log('');
 
@@ -175,28 +173,19 @@ export const processStyleTransfer = async (photoFile, selectedStyle, apiKey, onP
       throw new Error('Processing did not succeed');
     }
 
-    // 5. Get result URL
     const resultUrl = Array.isArray(result.output) ? result.output[0] : result.output;
 
     if (!resultUrl) {
       throw new Error('No result image');
     }
 
-    // 6. Download and create local blob
     if (onProgress) onProgress('이미지 다운로드 중...');
     
     const imageResponse = await fetch(resultUrl);
     const blob = await imageResponse.blob();
     const localUrl = URL.createObjectURL(blob);
 
-    // ========== AI 선택 정보 추출 (다양한 키 시도) ==========
-    const aiSelectedArtist = result.selected_artist 
-                          || result.selectedArtist 
-                          || result.artist 
-                          || result.aiSelectedArtist
-                          || null;
-
-    console.log('✅ Final aiSelectedArtist:', aiSelectedArtist);
+    console.log('✅ Using AI info from FIRST response:', aiSelectionInfo.artist);
 
     return {
       success: true,
@@ -206,10 +195,9 @@ export const processStyleTransfer = async (photoFile, selectedStyle, apiKey, onP
       model: modelConfig.model,
       cost: modelConfig.cost,
       time: modelConfig.time,
-      // AI 선택 정보 추가
-      aiSelectedArtist: aiSelectedArtist,
-      selectionMethod: result.selection_method || result.selectionMethod,
-      selectionDetails: result.selection_details || result.selectionDetails
+      aiSelectedArtist: aiSelectionInfo.artist,
+      selectionMethod: aiSelectionInfo.method,
+      selectionDetails: aiSelectionInfo.details
     };
 
   } catch (error) {
@@ -221,7 +209,6 @@ export const processStyleTransfer = async (photoFile, selectedStyle, apiKey, onP
   }
 };
 
-// Mock function for testing without API
 export const mockStyleTransfer = async (photoFile, selectedStyle, onProgress) => {
   return new Promise((resolve) => {
     let progress = 0;
@@ -248,5 +235,4 @@ export const mockStyleTransfer = async (photoFile, selectedStyle, onProgress) =>
   });
 };
 
-// Export for backward compatibility
 export const applyStyleTransfer = processStyleTransfer;
