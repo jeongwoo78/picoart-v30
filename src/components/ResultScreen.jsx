@@ -12,7 +12,7 @@ const ResultScreen = ({ originalPhoto, resultImage, selectedStyle, aiSelectedArt
   // 2차 교육 생성
   useEffect(() => {
     generate2ndEducation();
-  }, []);
+  }, [aiSelectedArtist]);
 
   const generate2ndEducation = async () => {
     try {
@@ -65,27 +65,52 @@ const ResultScreen = ({ originalPhoto, resultImage, selectedStyle, aiSelectedArt
   const getOrientalEducation = () => {
     const styleId = selectedStyle.id;
     
-    // 한국 - 민화 (고정)
+    console.log('=== Oriental Education Debug ===');
+    console.log('styleId:', styleId);
+    console.log('aiSelectedArtist:', aiSelectedArtist);
+    console.log('aiSelectedArtist type:', typeof aiSelectedArtist);
+    
+    // 한국 - AI 선택 결과에 따라 3가지 중 선택
     if (styleId === 'korean') {
-      return orientalEducation.korean.description;
+      const genre = aiSelectedArtist?.toLowerCase() || '';
+      
+      console.log('korean genre:', genre);
+      
+      if (genre.includes('minhwa') || genre.includes('민화')) {
+        console.log('✅ Selecting korean_minhwa');
+        return orientalEducation.korean_minhwa?.description || orientalEducation.korean?.description;
+      } else if (genre.includes('genre') || genre.includes('풍속')) {
+        console.log('✅ Selecting korean_genre');
+        return orientalEducation.korean_genre?.description || orientalEducation.korean?.description;
+      } else {
+        console.log('✅ Selecting korean_ink (default)');
+        // 기본: 수묵화
+        return orientalEducation.korean_ink?.description || orientalEducation.korean?.description;
+      }
     }
     
     // 중국 - AI 선택 결과에 따라 수묵화/공필화
     if (styleId === 'chinese') {
-      // aiSelectedArtist에서 스타일 판단
       const artist = aiSelectedArtist?.toLowerCase() || '';
       
+      console.log('chinese artist:', artist);
+      console.log('includes gongbi:', artist.includes('gongbi'));
+      console.log('includes 공필:', artist.includes('공필'));
+      
       if (artist.includes('gongbi') || artist.includes('공필')) {
-        return orientalEducation.chinese_gongbi.description;
+        console.log('✅ Selecting chinese_gongbi');
+        return orientalEducation.chinese_gongbi?.description || orientalEducation.chinese_ink?.description;
       } else {
+        console.log('⚠️ Selecting chinese_ink (default)');
         // 기본은 수묵화
-        return orientalEducation.chinese_ink.description;
+        return orientalEducation.chinese_ink?.description;
       }
     }
     
-    // 일본 - 우키요에 (고정)
+    // 일본 - 우키요에
     if (styleId === 'japanese') {
-      return orientalEducation.japanese.description;
+      console.log('✅ Selecting japanese_ukiyoe');
+      return orientalEducation.japanese_ukiyoe?.description || orientalEducation.japanese?.description;
     }
     
     return null;
