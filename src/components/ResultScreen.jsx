@@ -1,26 +1,44 @@
-// PicoArt v25 - ResultScreen (단순화된 동양화 교육)
-// 결과물: 미리 작성된 동양화 설명 + AI 생성 미술사조/거장 설명
+// PicoArt v30 - ResultScreen
+// 동양화 6개 장르 지원 + 디버깅 로그 강화
+// 2025-11-11 최종 버전
+
 import React, { useState, useEffect } from 'react';
 import BeforeAfter from './BeforeAfter';
 import { orientalEducation } from '../data/educationContent';
 
-const ResultScreen = ({ originalPhoto, resultImage, selectedStyle, aiSelectedArtist, onReset }) => {
+
+const ResultScreen = ({ 
+  originalPhoto, 
+  resultImage, 
+  selectedStyle, 
+  aiSelectedArtist, 
+  onReset 
+}) => {
+  
+  // ========== State ==========
   const [showInfo, setShowInfo] = useState(true);
   const [educationText, setEducationText] = useState('');
   const [isLoadingEducation, setIsLoadingEducation] = useState(true);
 
-  // 2차 교육 생성
+
+  // ========== Effects ==========
+  // aiSelectedArtist가 변경될 때마다 2차 교육 재생성
   useEffect(() => {
+    console.log('🎨 ResultScreen mounted or aiSelectedArtist changed');
     generate2ndEducation();
   }, [aiSelectedArtist]);
 
+
+  // ========== 2차 교육 생성 ==========
   const generate2ndEducation = async () => {
     try {
       setIsLoadingEducation(true);
       
       // 동양화는 미리 작성된 콘텐츠 사용 (AI 호출 없음)
       if (selectedStyle.category === 'oriental') {
+        console.log('📜 Loading pre-written oriental education...');
         const content = getOrientalEducation();
+        
         if (content) {
           setEducationText(content);
           setIsLoadingEducation(false);
@@ -28,7 +46,8 @@ const ResultScreen = ({ originalPhoto, resultImage, selectedStyle, aiSelectedArt
         }
       }
       
-      // 미술사조/거장만 AI 생성
+      // 미술사조/거장은 AI로 생성
+      console.log('🤖 Generating AI education...');
       const prompt = buildPrompt();
       
       // 백엔드 API 호출
@@ -47,80 +66,123 @@ const ResultScreen = ({ originalPhoto, resultImage, selectedStyle, aiSelectedArt
       const data = await response.json();
       
       if (data.success && data.text) {
+        console.log('✅ AI education generated successfully');
         setEducationText(data.text);
       } else {
         throw new Error('Invalid response format');
       }
       
     } catch (error) {
-      console.error('2nd education generation failed:', error);
-      // Fallback 메시지
+      console.error('❌ 2nd education generation failed:', error);
       setEducationText(getFallbackMessage());
     } finally {
       setIsLoadingEducation(false);
     }
   };
 
-  // 동양화 교육 콘텐츠 가져오기 (미리 작성된 것)
+
+  // ========== 동양화 교육 콘텐츠 (v30) ==========
   const getOrientalEducation = () => {
     const styleId = selectedStyle.id;
     
-    console.log('=== Oriental Education Debug ===');
-    console.log('styleId:', styleId);
-    console.log('aiSelectedArtist:', aiSelectedArtist);
-    console.log('aiSelectedArtist type:', typeof aiSelectedArtist);
+    console.log('');
+    console.log('========================================');
+    console.log('🔍 ORIENTAL EDUCATION DEBUG (v30)');
+    console.log('========================================');
+    console.log('📌 selectedStyle.id:', styleId);
+    console.log('📌 aiSelectedArtist:', aiSelectedArtist);
+    console.log('📌 aiSelectedArtist type:', typeof aiSelectedArtist);
+    console.log('========================================');
+    console.log('');
     
-    // 한국 - AI 선택 결과에 따라 3가지 중 선택
+    
+    // ========== 한국 전통 회화 (3가지) ==========
     if (styleId === 'korean') {
       const genre = aiSelectedArtist?.toLowerCase() || '';
+      console.log('🇰🇷 KOREAN ART DETECTION:');
+      console.log('   - genre string:', genre);
+      console.log('');
       
-      console.log('korean genre:', genre);
-      
+      // 민화
       if (genre.includes('minhwa') || genre.includes('민화')) {
-        console.log('✅ Selecting korean_minhwa');
-        return orientalEducation.korean_minhwa?.description || orientalEducation.korean?.description;
-      } else if (genre.includes('genre') || genre.includes('풍속')) {
-        console.log('✅ Selecting korean_genre');
-        return orientalEducation.korean_genre?.description || orientalEducation.korean?.description;
-      } else {
-        console.log('✅ Selecting korean_ink (default)');
-        // 기본: 수묵화
-        return orientalEducation.korean_ink?.description || orientalEducation.korean?.description;
+        console.log('✅ MATCH: Korean Minhwa (민화)');
+        console.log('========================================');
+        console.log('');
+        return orientalEducation.korean_minhwa?.description 
+            || orientalEducation.korean?.description;
+      } 
+      
+      // 풍속화
+      else if (genre.includes('genre') || genre.includes('풍속')) {
+        console.log('✅ MATCH: Korean Genre Painting (풍속화)');
+        console.log('========================================');
+        console.log('');
+        return orientalEducation.korean_genre?.description 
+            || orientalEducation.korean?.description;
+      } 
+      
+      // 수묵화 (기본값)
+      else {
+        console.log('✅ DEFAULT: Korean Ink Painting (수묵화)');
+        console.log('========================================');
+        console.log('');
+        return orientalEducation.korean_ink?.description 
+            || orientalEducation.korean?.description;
       }
     }
     
-    // 중국 - AI 선택 결과에 따라 수묵화/공필화
+    
+    // ========== 중국 전통 회화 (2가지) ==========
     if (styleId === 'chinese') {
       const artist = aiSelectedArtist?.toLowerCase() || '';
+      console.log('🇨🇳 CHINESE ART DETECTION:');
+      console.log('   - artist string:', artist);
+      console.log('   - includes "gongbi"?', artist.includes('gongbi'));
+      console.log('   - includes "공필"?', artist.includes('공필'));
+      console.log('');
       
-      console.log('chinese artist:', artist);
-      console.log('includes gongbi:', artist.includes('gongbi'));
-      console.log('includes 공필:', artist.includes('공필'));
-      
+      // 공필화
       if (artist.includes('gongbi') || artist.includes('공필')) {
-        console.log('✅ Selecting chinese_gongbi');
-        return orientalEducation.chinese_gongbi?.description || orientalEducation.chinese_ink?.description;
-      } else {
-        console.log('⚠️ Selecting chinese_ink (default)');
-        // 기본은 수묵화
+        console.log('✅ MATCH: Chinese Gongbi (工筆畫)');
+        console.log('========================================');
+        console.log('');
+        return orientalEducation.chinese_gongbi?.description 
+            || orientalEducation.chinese_ink?.description;
+      } 
+      
+      // 수묵화 (기본값)
+      else {
+        console.log('✅ DEFAULT: Chinese Ink Wash (水墨畫)');
+        console.log('========================================');
+        console.log('');
         return orientalEducation.chinese_ink?.description;
       }
     }
     
-    // 일본 - 우키요에
+    
+    // ========== 일본 전통 회화 (1가지) ==========
     if (styleId === 'japanese') {
-      console.log('✅ Selecting japanese_ukiyoe');
-      return orientalEducation.japanese_ukiyoe?.description || orientalEducation.japanese?.description;
+      console.log('🇯🇵 JAPANESE ART DETECTION:');
+      console.log('✅ MATCH: Japanese Ukiyo-e (浮世繪)');
+      console.log('========================================');
+      console.log('');
+      return orientalEducation.japanese_ukiyoe?.description 
+          || orientalEducation.japanese?.description;
     }
     
+    
+    console.log('⚠️ NO MATCH - Returning null');
+    console.log('========================================');
+    console.log('');
     return null;
   };
 
-  // 카테고리별 프롬프트 생성
+
+  // ========== 프롬프트 생성 (미술사조/거장) ==========
   const buildPrompt = () => {
     const category = selectedStyle.category;
     
-    // 고대 미술, 비잔틴·이슬람 (특정 화가 없음 - 양식/시대로 설명)
+    // 고대 미술, 비잔틴·이슬람
     if (category === 'ancient' || category === 'byzantineIslamic') {
       return `당신은 미술사 전문가입니다.
 사용자가 선택한 미술사조는 "${selectedStyle.name}"입니다.
@@ -132,25 +194,10 @@ const ResultScreen = ({ originalPhoto, resultImage, selectedStyle, aiSelectedArt
 1문장: "당신의 사진에는 ${selectedStyle.name}의 {대표 기법명과 특징} 기법이 적용되었습니다."
 2문장: "${selectedStyle.name}은 {시대 범위}의 {문화권} 미술로, {핵심 특징과 추구한 가치를 상세히} 설명."
 3문장: "대표 유물로는 {유물1}, {유물2}, {유물3} 등이 있으며, {유물들의 공통 의미를 한 문장으로}."
-4문장(선택): "{현대에 미친 영향이나 당신 사진과의 연결을 한 문장으로}"
-
-예시 (비잔틴·이슬람):
-당신의 사진에는 비잔틴·이슬람 미술의 황금 모자이크와 
-기하학적 아라베스크 문양 기법이 적용되었습니다.
-
-비잔틴·이슬람 미술은 AD 400-1400년의 동로마 제국과 이슬람 문화권 미술로, 
-황금빛으로 빛나는 모자이크와 무한히 반복되는 기하학 패턴을 통해
-신성함과 영원함을 표현하는 것이 특징입니다.
-
-대표 유물로는 하기아 소피아의 모자이크, 알함브라 궁전의 아라베스크, 
-바위의 돔의 황금 장식 등이 있으며, 이들은 모두 인간이 신성에 다가가려는 
-영적 열망을 담고 있습니다.
-
-천년이 지난 지금도 그 황금빛이 바래지 않듯, 당신의 사진 역시 
-시간을 초월한 아름다움으로 빛나고 있습니다.`;
+4문장(선택): "{현대에 미친 영향이나 당신 사진과의 연결을 한 문장으로}"`;
     }
     
-    // 나머지 미술사조 (특정 화가 있음)
+    // 미술사조 (특정 화가 있음)
     if (category === 'impressionism' || category === 'postImpressionism' || 
         category === 'fauvism' || category === 'expressionism' || 
         category === 'renaissance' || category === 'baroque' || 
@@ -164,20 +211,7 @@ const ResultScreen = ({ originalPhoto, resultImage, selectedStyle, aiSelectedArt
 1문장: "당신의 사진에는 {화가명}의 {대표 기법명} 기법이 적용되었습니다."
 2문장: "{화가명}({생몰연도})은 {국적} 출신 {화풍} 화가로, {핵심 특징 상세 설명}이 특징입니다."
 3문장: "대표작으로는 "{작품1}", "{작품2}", "{작품3}" 등이 있으며, {작품들의 공통점이나 화가의 예술 철학 한 줄}."
-4문장(선택): "{화가의 인상적인 일화나 영향, 또는 당신 사진과의 연결을 한 문장으로}"
-
-예시:
-당신의 사진에는 클로드 모네의 보색 대비와 색채 분할 기법이 적용되었습니다.
-
-클로드 모네(1840-1926)는 프랑스 출신 인상주의의 창시자로, 
-같은 장소를 서로 다른 시간대에 반복해서 그리며 빛의 순간적 변화를 
-포착하는 것이 특징입니다.
-
-대표작으로는 수련 연작 40여 점, 루앙 대성당 연작, "인상, 해돋이" 등이 있으며,
-모두 빛과 시간의 흐름을 담아내려는 평생의 탐구를 보여줍니다.
-
-시력을 잃어가면서도 "빛과 색채 속에서 사라지고 싶다"고 말했던 그의 열정이
-당신의 사진에도 담겨 있습니다.`;
+4문장(선택): "{화가의 인상적인 일화나 영향, 또는 당신 사진과의 연결을 한 문장으로}"`;
     }
     
     // 거장
@@ -190,34 +224,20 @@ const ResultScreen = ({ originalPhoto, resultImage, selectedStyle, aiSelectedArt
 1문장: "당신의 사진에는 {화가명}의 {특정 시기나 스타일의} {구체적 기법명} 기법이 적용되었습니다."
 2문장: "{화가명}({생몰연도})은 {국적} 출신 {화풍} 화가로, {핵심 특징과 예술적 추구를 상세히} 설명."
 3문장: "대표작으로는 "{작품1}", "{작품2}", "{작품3}" 등이 있으며, {작품들의 특징을 한 문장으로}."
-4문장(선택): "{화가의 인상적인 일화나 당신 사진과의 연결을 한 문장으로}"
-
-예시:
-당신의 사진에는 빈센트 반 고흐의 아를 시대 임파스토와 
-소용돌이치는 붓터치 기법이 적용되었습니다.
-
-빈센트 반 고흐(1853-1890)는 네덜란드 출신 후기인상주의 화가로, 
-물감을 두껍게 쌓아올리고 격렬한 붓질로 내면의 감정을 
-직접적으로 표현하는 것이 특징입니다.
-
-대표작으로는 소용돌이치는 "별이 빛나는 밤", 타오르는 "해바라기" 연작,
-불안한 "까마귀가 나는 밀밭" 등이 있으며, 모두 그의 뜨거운 감정이 
-붓끝을 통해 폭발하듯 쏟아져 나온 작품들입니다.
-
-"나는 별이 되고 싶다"고 썼던 그의 꿈이 당신의 사진 속에서 빛나고 있습니다.`;
+4문장(선택): "{화가의 인상적인 일화나 당신 사진과의 연결을 한 문장으로}"`;
     }
-    
-    // 동양화는 미리 작성된 콘텐츠 사용 (이 함수 호출 안 됨)
-    // getOrientalEducation()에서 처리
     
     return '';
   };
 
-  // Fallback 메시지
+
+  // ========== Fallback 메시지 ==========
   const getFallbackMessage = () => {
     return `이 작품은 ${selectedStyle.name} 스타일로 변환되었습니다.`;
   };
 
+
+  // ========== 다운로드 ==========
   const handleDownload = async () => {
     try {
       const response = await fetch(resultImage);
@@ -237,6 +257,8 @@ const ResultScreen = ({ originalPhoto, resultImage, selectedStyle, aiSelectedArt
     }
   };
 
+
+  // ========== 공유 ==========
   const handleShare = async () => {
     if (navigator.share) {
       try {
@@ -254,9 +276,13 @@ const ResultScreen = ({ originalPhoto, resultImage, selectedStyle, aiSelectedArt
     }
   };
 
+
+  // ========== Render ==========
   return (
     <div className="result-screen">
       <div className="result-container">
+        
+        {/* Header */}
         <div className="result-header">
           <h1>✨ 완성!</h1>
           <p className="result-subtitle">
@@ -272,7 +298,7 @@ const ResultScreen = ({ originalPhoto, resultImage, selectedStyle, aiSelectedArt
           />
         </div>
 
-        {/* 화법 설명 Toggle */}
+        {/* Toggle Button */}
         <div className="info-toggle">
           <button 
             className="toggle-button"
@@ -282,17 +308,24 @@ const ResultScreen = ({ originalPhoto, resultImage, selectedStyle, aiSelectedArt
           </button>
         </div>
 
-        {/* 화법 설명 카드 */}
+        {/* Education Card */}
         {showInfo && (
           <div className="technique-card">
+            
+            {/* Card Header */}
             <div className="card-header">
-              <div className="technique-icon">{selectedStyle.icon || '🎨'}</div>
+              <div className="technique-icon">
+                {selectedStyle.icon || '🎨'}
+              </div>
               <div>
                 <h2>{selectedStyle.name}</h2>
-                <p className="technique-subtitle">{aiSelectedArtist || '예술 스타일'}</p>
+                <p className="technique-subtitle">
+                  {aiSelectedArtist || '예술 스타일'}
+                </p>
               </div>
             </div>
 
+            {/* Card Content */}
             <div className="card-content">
               {isLoadingEducation ? (
                 <div className="loading-education">
@@ -302,30 +335,46 @@ const ResultScreen = ({ originalPhoto, resultImage, selectedStyle, aiSelectedArt
               ) : (
                 <div className="technique-explanation">
                   <h3>🖌️ 적용된 예술 기법</h3>
-                  <p style={{ whiteSpace: 'pre-line' }}>{educationText}</p>
+                  <p style={{ whiteSpace: 'pre-line' }}>
+                    {educationText}
+                  </p>
                 </div>
               )}
             </div>
+            
           </div>
         )}
 
         {/* Action Buttons */}
         <div className="action-buttons">
-          <button className="btn btn-download" onClick={handleDownload}>
+          <button 
+            className="btn btn-download" 
+            onClick={handleDownload}
+          >
             <span className="btn-icon">📥</span>
             다운로드
           </button>
-          <button className="btn btn-share" onClick={handleShare}>
+          
+          <button 
+            className="btn btn-share" 
+            onClick={handleShare}
+          >
             <span className="btn-icon">🔗</span>
             공유하기
           </button>
-          <button className="btn btn-reset" onClick={onReset}>
+          
+          <button 
+            className="btn btn-reset" 
+            onClick={onReset}
+          >
             <span className="btn-icon">🔄</span>
             다시 만들기
           </button>
         </div>
+        
       </div>
 
+      {/* Styles */}
       <style>{`
         .result-screen {
           min-height: 100vh;
