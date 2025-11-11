@@ -1,4 +1,4 @@
-// PicoArt v25 - StyleSelection (간소화: AI가 자동 선택)
+// PicoArt v31 - StyleSelection (미술사조 10개 + 거장 시간순)
 import React, { useState } from 'react';
 import { educationContent } from '../data/educationContent';
 
@@ -6,18 +6,18 @@ const StyleSelection = ({ onSelect }) => {
   const [mainCategory, setMainCategory] = useState('movements'); // movements, masters, oriental
   const [subCategory, setSubCategory] = useState('renaissance');
 
-  // 스타일 카테고리 정의
+  // 스타일 카테고리 정의 (v31: 10개 사조)
   const styleCategories = {
-    // 미술사조
+    // 미술사조 10개
     ancient: { name: '고대 미술', period: 'BC 800 - AD 500' },
     byzantineIslamic: { name: '비잔틴·이슬람', period: '4-14세기' },
     renaissance: { name: '르네상스', period: '14-16세기' },
     baroque: { name: '바로크', period: '17세기' },
-    rococo: { name: '로코코', period: '18세기' },
-    romanticism: { name: '낭만주의', period: '18세기 말-19세기' },
+    neoclassicism: { name: '신고전주의', period: '18세기 후반' },
+    romanticism: { name: '낭만주의', period: '19세기 전반' },
+    realism: { name: '사실주의', period: '19세기 중반' },
     impressionism: { name: '인상주의', period: '19세기 후반' },
     postImpressionism: { name: '후기인상주의', period: '1880-1900년대' },
-    fauvism: { name: '야수파', period: '20세기 초' },
     expressionism: { name: '표현주의', period: '20세기 초' },
     
     // 거장 (대 카테고리와 소 카테고리 이름 통일)
@@ -27,27 +27,27 @@ const StyleSelection = ({ onSelect }) => {
     oriental: { name: '동양화', period: '한·중·일 전통' }
   };
 
-  // 스타일 데이터 (AI가 자동 선택하므로 최소 정보만)
+  // 스타일 데이터 (AI가 자동 선택하므로 최소 정보만) - v31: 10개 사조
   const artStyles = [
-    // 미술사조
+    // 미술사조 10개 (시간순)
     { id: 'ancient', name: '고대 미술', category: 'ancient', icon: '🏛️', description: '그리스·로마의 완벽한 균형미' },
     { id: 'byzantineIslamic', name: '비잔틴·이슬람', category: 'byzantineIslamic', icon: '🕌', description: '신성한 황금 모자이크' },
     { id: 'renaissance', name: '르네상스', category: 'renaissance', icon: '🎭', description: '인간 중심의 이상적 아름다움' },
     { id: 'baroque', name: '바로크', category: 'baroque', icon: '👑', description: '극적이고 웅장한 표현' },
-    { id: 'rococo', name: '로코코', category: 'rococo', icon: '🌸', description: '우아하고 장식적인 취향' },
+    { id: 'neoclassicism', name: '신고전주의', category: 'neoclassicism', icon: '🏛️', description: '이성과 질서의 부활' },
     { id: 'romanticism', name: '낭만주의', category: 'romanticism', icon: '🌊', description: '감정과 자연의 숭고함' },
+    { id: 'realism', name: '사실주의', category: 'realism', icon: '👨‍🌾', description: '있는 그대로의 현실' },
     { id: 'impressionism', name: '인상주의', category: 'impressionism', icon: '🌅', description: '빛의 순간을 포착' },
     { id: 'postImpressionism', name: '후기인상주의', category: 'postImpressionism', icon: '🌻', description: '감정과 구조의 탐구' },
-    { id: 'fauvism', name: '야수파', category: 'fauvism', icon: '🦁', description: '순수하고 강렬한 원색' },
     { id: 'expressionism', name: '표현주의', category: 'expressionism', icon: '😱', description: '내면의 불안과 고독' },
     
-    // 거장
-    { id: 'klimt-master', name: '구스타프 클림트', nameEn: 'Gustav Klimt', category: 'masters', icon: '✨', description: '금박과 장식의 화가' },
-    { id: 'picasso-master', name: '파블로 피카소', nameEn: 'Pablo Picasso', category: 'masters', icon: '🎨', description: '입체주의의 창시자' },
-    { id: 'vangogh-master', name: '빈센트 반 고흐', nameEn: 'Vincent van Gogh', category: 'masters', icon: '🌻', description: '격렬한 감정의 표현' },
-    { id: 'matisse-master', name: '앙리 마티스', nameEn: 'Henri Matisse', category: 'masters', icon: '🎭', description: '색채의 마술사' },
-    { id: 'munch-master', name: '에드바르 뭉크', nameEn: 'Edvard Munch', category: 'masters', icon: '😱', description: '불안과 고독의 화가' },
-    { id: 'dali-master', name: '살바도르 달리', nameEn: 'Salvador Dalí', category: 'masters', icon: '⏰', description: '초현실주의의 거장' },
+    // 거장 6명 (시간순: 출생연도)
+    { id: 'vangogh-master', name: '빈센트 반 고흐', nameEn: 'Vincent van Gogh', category: 'masters', icon: '🌻', description: '1853-1890 | 후기인상주의' },
+    { id: 'klimt-master', name: '구스타프 클림트', nameEn: 'Gustav Klimt', category: 'masters', icon: '✨', description: '1862-1918 | 아르누보' },
+    { id: 'munch-master', name: '에드바르 뭉크', nameEn: 'Edvard Munch', category: 'masters', icon: '😱', description: '1863-1944 | 표현주의' },
+    { id: 'matisse-master', name: '앙리 마티스', nameEn: 'Henri Matisse', category: 'masters', icon: '🎭', description: '1869-1954 | 야수파' },
+    { id: 'picasso-master', name: '파블로 피카소', nameEn: 'Pablo Picasso', category: 'masters', icon: '🎨', description: '1881-1973 | 입체주의' },
+    { id: 'dali-master', name: '살바도르 달리', nameEn: 'Salvador Dalí', category: 'masters', icon: '⏰', description: '1904-1989 | 초현실주의' },
     
     // 동양화
     { id: 'korean', name: '한국 전통 회화', nameEn: 'Korean Art', category: 'oriental', icon: '🎎', description: '여백의 미와 절제미' },
@@ -55,13 +55,13 @@ const StyleSelection = ({ onSelect }) => {
     { id: 'japanese', name: '일본 전통 회화', nameEn: 'Japanese Art', category: 'oriental', icon: '🗾', description: '섬세한 관찰과 대담한 생략' }
   ];
 
-  // 대 카테고리 정의
+  // 대 카테고리 정의 (v31: 10개 사조)
   const mainCategories = {
     movements: {
       name: '미술사조',
       icon: '🎨',
       description: '서양 미술의 흐름',
-      subcategories: ['ancient', 'byzantineIslamic', 'renaissance', 'baroque', 'rococo', 'romanticism', 'impressionism', 'postImpressionism', 'fauvism', 'expressionism']
+      subcategories: ['ancient', 'byzantineIslamic', 'renaissance', 'baroque', 'neoclassicism', 'romanticism', 'realism', 'impressionism', 'postImpressionism', 'expressionism']
     },
     masters: {
       name: '거장 컬렉션',
