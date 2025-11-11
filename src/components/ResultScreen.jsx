@@ -121,7 +121,7 @@ const ResultScreen = ({
             || orientalEducation.korean?.description;
       } 
       
-      // 진경산수화 (기본값)
+      // 진경산수화 (기본값 + jingyeong 키워드)
       else {
         console.log('✅ DEFAULT: Korean True-View Landscape (진경산수화)');
         console.log('========================================');

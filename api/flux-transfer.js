@@ -205,14 +205,16 @@ CRITICAL INSTRUCTIONS FOR PROMPT GENERATION:
    - Any Japanese text = COMPLETE FAILURE
    - This is KOREAN ART, not Japanese art
 
-Return ONLY valid JSON (no markdown):
+Return ONLY valid JSON in ENGLISH (no markdown, no Korean):
 {
   "analysis": "brief photo description including gender if person present (1 sentence)",
-  "selected_artist": "Korean Minhwa" or "Korean Pungsokdo" or "Korean Jingyeong Landscape",
-  "selected_style": "minhwa" or "pungsokdo" or "landscape",
+  "selected_artist": "Korean Minhwa" OR "Korean Pungsokdo" OR "Korean Jingyeong" (MUST be exactly one of these three, IN ENGLISH),
+  "selected_style": "minhwa" OR "pungsokdo" OR "jingyeong",
   "reason": "why this style fits (1 sentence)",
   "prompt": "Complete FLUX prompt starting with GENDER RULE if person present, then 'Korean [style name]...' with all characteristics. MUST include 'ABSOLUTELY NO Japanese hiragana (ひらがな) or katakana (カタカナ), NO Japanese calligraphy, use ONLY Korean traditional calligraphy, this is PURE KOREAN ART' at the end."
 }
+
+CRITICAL: selected_artist MUST be exactly "Korean Minhwa", "Korean Pungsokdo", or "Korean Jingyeong" - no other variations allowed.
 
 Keep it concise and accurate.`;
       }
@@ -256,14 +258,16 @@ CRITICAL INSTRUCTIONS FOR PROMPT GENERATION:
    - Any Japanese text = COMPLETE FAILURE
    - This is CHINESE ART with CHINESE CHARACTERS ONLY, not Japanese art
 
-Return ONLY valid JSON (no markdown):
+Return ONLY valid JSON in ENGLISH (no markdown, no Chinese):
 {
   "analysis": "brief photo description including gender if person present (1 sentence)",
-  "selected_artist": "Chinese Ink Wash" or "Chinese Gongbi" or "Chinese Huaniao",
-  "selected_style": "ink_wash" or "gongbi" or "huaniao",
+  "selected_artist": "Chinese Ink Wash" OR "Chinese Gongbi" OR "Chinese Huaniao" (MUST be exactly one of these three, IN ENGLISH),
+  "selected_style": "ink_wash" OR "gongbi" OR "huaniao",
   "reason": "why this style fits (1 sentence)",
   "prompt": "Complete FLUX prompt starting with GENDER RULE if person present, then 'Chinese [style name]...' with all characteristics. MUST include 'ABSOLUTELY NO Japanese hiragana (ひらがな) or katakana (カタカナ), NO Japanese calligraphy, ONLY CHINESE CHARACTERS (漢字) and traditional Chinese calligraphy allowed, this is PURE CHINESE ART' at the end."
 }
+
+CRITICAL: selected_artist MUST be exactly "Chinese Ink Wash", "Chinese Gongbi", or "Chinese Huaniao" - no other variations allowed.
 
 Keep it concise and accurate.`;
       }
