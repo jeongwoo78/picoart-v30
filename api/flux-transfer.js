@@ -106,7 +106,7 @@ const fallbackPrompts = {
   
   chinese: {
     name: '중국 전통화',
-    prompt: 'Chinese traditional painting in authentic classical style. CRITICAL INSTRUCTIONS: 1) GENDER PRESERVATION - carefully preserve exact gender and facial features from original photo (male stays male with masculine face, female stays female with feminine features), 2) Choose appropriate Chinese painting style: Gongbi meticulous painting for people/portraits with fine detailed brushwork and rich colors, Shuimohua ink wash for landscapes with monochrome ink gradations, Huaniao bird-and-flower for animals/plants with precise naturalistic rendering. 3) Use traditional Chinese brush painting aesthetic on silk or paper. ABSOLUTELY NO Japanese hiragana (ひらがな) or katakana (カタカナ). This is PURE CHINESE ART.'
+    prompt: 'Chinese traditional painting in authentic classical style. CRITICAL INSTRUCTIONS: 1) GENDER PRESERVATION - carefully preserve exact gender and facial features from original photo (male stays male with masculine face, female stays female with feminine features), 2) Choose appropriate Chinese style based on photo subject (Shuimohua ink wash for landscapes/nature with monochrome gradations, Gongbi meticulous painting for people/portraits with fine detailed brushwork and rich colors, Huaniao bird-and-flower for animals/plants with precise naturalistic rendering), 3) Use Chinese aesthetic principles. ABSOLUTELY NO Japanese hiragana (ひらがな) or katakana (カタカナ). ONLY CHINESE CHARACTERS (漢字/汉字) allowed. This is PURE CHINESE ART with CHINESE CHARACTERS ONLY.'
   },
   
   japanese: {
@@ -216,25 +216,25 @@ Keep it concise and accurate.`;
       }
       
       if (styleId === 'chinese') {
-        // 중국 - Claude가 3가지 스타일 중 선택 (한국 구조 복사)
+        // 중국 - Claude가 3가지 스타일 중 선택
         promptText = `Analyze this photo and select the BEST Chinese traditional painting style.
 
 You must choose ONE of these THREE styles:
 
-Style 1: Chinese Gongbi Meticulous Painting (工筆畫)
-- Best for: people, portraits, daily life, detailed subjects, colorful compositions
-- Characteristics: Extremely fine detailed brushwork, delicate precise lines, rich mineral pigments and brilliant colors, ornate decorative patterns, imperial court quality
-- When: Photo has people, faces, human subjects
+Style 1: Chinese Ink Wash Painting (水墨畫 Shuimohua)
+- Best for: landscapes, mountains, nature, trees, contemplative subjects, simple compositions
+- Characteristics: Monochrome black ink with gradations (deep black to light grey), soft flowing brushstrokes, minimalist composition with elegant empty space, misty atmosphere
+- When: Photo has landscapes, nature, or needs meditative serene treatment
 
-Style 2: Chinese Ink Wash Painting (水墨畫 Shuimohua)
-- Best for: landscapes, mountains, nature, trees, contemplative subjects
-- Characteristics: Monochrome black ink with gradations, soft flowing brushstrokes, minimalist composition with elegant empty space, misty atmosphere
-- When: Photo has natural landscapes, mountains, scenery
+Style 2: Chinese Gongbi Meticulous Painting (工筆畫)
+- Best for: portraits, people, detailed subjects, colorful compositions
+- Characteristics: Extremely fine detailed brushwork, delicate precise lines, rich mineral pigments and brilliant colors, ornate decorative patterns, imperial court quality
+- When: Photo has people, faces, or needs detailed colorful treatment
 
 Style 3: Chinese Huaniao Bird-and-Flower (花鳥畫)
 - Best for: birds, flowers, animals, plants, natural subjects
 - Characteristics: Detailed naturalistic rendering, precise meticulous brushwork for feathers and petals, delicate soft colors, harmonious composition
-- When: Photo has animals, flowers, plants
+- When: Photo has birds, flowers, animals, or plants
 
 Analyze the photo and choose the MOST suitable style.
 
@@ -248,16 +248,17 @@ CRITICAL INSTRUCTIONS FOR PROMPT GENERATION:
 2. JAPANESE TEXT PROHIBITION (CRITICAL):
    - ABSOLUTELY NO Japanese hiragana (ひらがな) - NEVER ALLOWED
    - ABSOLUTELY NO Japanese katakana (カタカナ) - NEVER ALLOWED
+   - ONLY CHINESE CHARACTERS (漢字/汉字) ALLOWED - NO Japanese kana whatsoever
    - Any Japanese text = COMPLETE FAILURE
-   - This is CHINESE ART, not Japanese art
+   - This is CHINESE ART with CHINESE CHARACTERS ONLY, not Japanese art
 
 Return ONLY valid JSON (no markdown):
 {
   "analysis": "brief photo description including gender if person present (1 sentence)",
-  "selected_artist": "Chinese Gongbi" or "Chinese Ink Wash" or "Chinese Huaniao",
-  "selected_style": "gongbi" or "ink_wash" or "huaniao",
+  "selected_artist": "Chinese Ink Wash" or "Chinese Gongbi" or "Chinese Huaniao",
+  "selected_style": "ink_wash" or "gongbi" or "huaniao",
   "reason": "why this style fits (1 sentence)",
-  "prompt": "Complete FLUX prompt starting with GENDER RULE if person present, then 'Chinese [style name]...' with all characteristics. MUST include 'ABSOLUTELY NO Japanese hiragana (ひらがな) or katakana (カタカナ), this is PURE CHINESE ART' at the end."
+  "prompt": "Complete FLUX prompt starting with GENDER RULE if person present, then 'Chinese [style name]...' with all characteristics. MUST include 'ABSOLUTELY NO Japanese hiragana (ひらがな) or katakana (カタカナ), ONLY CHINESE CHARACTERS (漢字) allowed, this is PURE CHINESE ART' at the end."
 }
 
 Keep it concise and accurate.`;
@@ -436,7 +437,7 @@ export default async function handler(req, res) {
       const aiResult = await selectArtistWithAI(
         image, 
         selectedStyle,  // ← selectedStyle 객체 전체 전달
-        15000 // 15초 타임아웃 (단체 사진 처리 위해)
+        8000 // 8초 타임아웃
       );
       
       if (aiResult.success) {
@@ -537,7 +538,7 @@ export default async function handler(req, res) {
             prompt: finalPrompt,
             num_inference_steps: 24,       // 28→24 속도 최적화 (약 20% 빠름)
             guidance: 12,                   // 프롬프트 엄격 준수 (일본어/성별 보존)
-            control_strength: 0.65,         // 구도 유지 (0.85→0.65 스타일 적용 대폭 강화)
+            control_strength: 1.0,          // 구도 완벽 유지 (일관성 최대화)
             output_format: 'jpg',
             output_quality: 90
           }
@@ -556,16 +557,10 @@ export default async function handler(req, res) {
 
     const data = await response.json();
     console.log('✅ FLUX Depth completed');
-    console.log('📤 Returning prediction with AI info:', {
-      id: data.id,
-      artist: selectedArtist,
-      method: selectionMethod
-    });
     
-    // ========== v30: AI 선택 정보를 첫 응답에 명확히 포함 ==========
+    // 결과에 선택 정보 포함
     res.status(200).json({
-      id: data.id,
-      status: data.status,
+      ...data,
       selected_artist: selectedArtist,
       selection_method: selectionMethod,
       selection_details: selectionDetails
