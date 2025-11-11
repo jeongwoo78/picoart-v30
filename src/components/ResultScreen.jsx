@@ -122,6 +122,15 @@ const ResultScreen = ({
       } 
       
       // 수묵화 (기본값)
+      else if (genre.includes('ink') || genre.includes('수묵') || genre.includes('jingyeong') || genre.includes('진경')) {
+        console.log('✅ MATCH: Korean Ink Painting (수묵화/진경산수)');
+        console.log('========================================');
+        console.log('');
+        return orientalEducation.korean_ink?.description 
+            || orientalEducation.korean?.description;
+      }
+      
+      // 정말 매칭 안되면 수묵화
       else {
         console.log('✅ DEFAULT: Korean Ink Painting (수묵화)');
         console.log('========================================');
