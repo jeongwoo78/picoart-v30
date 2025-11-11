@@ -121,33 +121,22 @@ const ResultScreen = ({
             || orientalEducation.korean?.description;
       } 
       
-      // 수묵화 (기본값)
-      else if (genre.includes('ink') || genre.includes('수묵') || genre.includes('jingyeong') || genre.includes('진경')) {
-        console.log('✅ MATCH: Korean Ink Painting (수묵화/진경산수)');
-        console.log('========================================');
-        console.log('');
-        return orientalEducation.korean_ink?.description 
-            || orientalEducation.korean?.description;
-      }
-      
-      // 정말 매칭 안되면 수묵화
+      // 진경산수화 (기본값)
       else {
-        console.log('✅ DEFAULT: Korean Ink Painting (수묵화)');
+        console.log('✅ DEFAULT: Korean True-View Landscape (진경산수화)');
         console.log('========================================');
         console.log('');
-        return orientalEducation.korean_ink?.description 
+        return orientalEducation.korean_jingyeong?.description 
             || orientalEducation.korean?.description;
       }
     }
     
     
-    // ========== 중국 전통 회화 (2가지) ==========
+    // ========== 중국 전통 회화 (3가지) ==========
     if (styleId === 'chinese') {
       const artist = aiSelectedArtist?.toLowerCase() || '';
       console.log('🇨🇳 CHINESE ART DETECTION:');
       console.log('   - artist string:', artist);
-      console.log('   - includes "gongbi"?', artist.includes('gongbi'));
-      console.log('   - includes "공필"?', artist.includes('공필'));
       console.log('');
       
       // 공필화
@@ -158,6 +147,15 @@ const ResultScreen = ({
         return orientalEducation.chinese_gongbi?.description 
             || orientalEducation.chinese_ink?.description;
       } 
+      
+      // 화조화
+      else if (artist.includes('huaniao') || artist.includes('화조') || artist.includes('flower') || artist.includes('bird')) {
+        console.log('✅ MATCH: Chinese Huaniao (花鳥畫)');
+        console.log('========================================');
+        console.log('');
+        return orientalEducation.chinese_huaniao?.description 
+            || orientalEducation.chinese_ink?.description;
+      }
       
       // 수묵화 (기본값)
       else {
