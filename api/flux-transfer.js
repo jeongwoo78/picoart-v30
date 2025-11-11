@@ -176,9 +176,9 @@ Keep it concise and accurate.`;
 You must choose ONE of these THREE styles:
 
 Style 1: Korean Minhwa Folk Painting (민화)
-- Best for: animals (tiger, magpie, fish), flowers (peony), birds, simple subjects WITHOUT people
+- Best for: animals (tiger, magpie, fish), flowers (peony), birds, buildings, architecture, man-made objects, simple subjects
 - Characteristics: THICK BLACK OUTLINES around all shapes, BRIGHT primary colors (Obangsaek: red/blue/yellow/white/black), completely FLAT naive composition, childlike playful aesthetic
-- When: Photo has animals, flowers, or needs cheerful colorful treatment, BUT NO PEOPLE
+- When: Photo has animals, flowers, buildings, architecture, man-made structures, or needs cheerful colorful treatment
 
 Style 2: Korean Pungsokdo Genre Painting (풍속도) ⭐ DEFAULT FOR PEOPLE
 - Best for: ANY photo with PEOPLE, portraits, faces, human subjects, daily life, couples, festivals
@@ -187,16 +187,21 @@ Style 2: Korean Pungsokdo Genre Painting (풍속도) ⭐ DEFAULT FOR PEOPLE
 - CRITICAL: If you see a PERSON in the photo, you MUST select Pungsokdo (풍속도)
 
 Style 3: Korean Jingyeong Landscape (진경산수)
-- Best for: mountains, nature, rocks, landscapes, scenery WITHOUT people
+- Best for: mountains, nature, rocks, landscapes, scenery
 - Characteristics: Bold expressive brushwork, dramatic angular forms, monochrome ink with strong contrasts, REAL Korean scenery (not idealized Chinese mountains)
-- When: Photo has natural landscapes, mountains, rocks, BUT NO PEOPLE
+- When: Photo has natural landscapes, mountains, rocks
 
-SELECTION RULE:
-- Person/face/people in photo? → ALWAYS Korean Pungsokdo
-- Animals/flowers only? → Korean Minhwa
-- Pure landscape/mountains/nature? → Korean Jingyeong
+SELECTION RULE - Analyze what is the MAIN SUBJECT of the photo:
+- Main subject is PERSON (large, centered, portrait) → Korean Pungsokdo
+- Main subject is BUILDING/ARCHITECTURE (with small or no people) → Korean Minhwa
+- Main subject is ANIMAL/FLOWER (with small or no people) → Korean Minhwa
+- Main subject is NATURAL LANDSCAPE/MOUNTAINS (with small or no people) → Korean Jingyeong
 
-Analyze the photo and choose the MOST suitable style.
+If person is the dominant element → Pungsokdo
+If building/object/animal/flower is dominant → Minhwa
+If natural scenery is dominant → Jingyeong
+
+Analyze the photo and choose based on the MAIN SUBJECT.
 
 CRITICAL INSTRUCTIONS FOR PROMPT GENERATION:
 1. GENDER PRESERVATION (MANDATORY IN PROMPT):
@@ -219,7 +224,11 @@ Return ONLY valid JSON in ENGLISH (no markdown, no Korean):
   "selected_artist": "Korean Minhwa" OR "Korean Pungsokdo" OR "Korean Jingyeong" (MUST be exactly one of these three, IN ENGLISH),
   "selected_style": "minhwa" OR "pungsokdo" OR "jingyeong",
   "reason": "why this style fits (1 sentence)",
-  "prompt": "Complete FLUX prompt starting with GENDER RULE if person present, then 'Korean [style name]...' with all characteristics. MUST include 'ABSOLUTELY NO Japanese hiragana (ひらがな) or katakana (カタカナ), NO Japanese calligraphy, use ONLY Korean traditional calligraphy, this is PURE KOREAN ART' at the end."
+  "prompt": "Complete FLUX prompt with this EXACT structure: 
+  1) Start with GENDER RULE if person present
+  2) Then: 'CRITICAL: ABSOLUTELY NO Japanese text - NO hiragana (ひらがな), NO katakana (カタカナ), NO Japanese kanji, NO Japanese calligraphy style. Use ONLY Korean Hanja (漢字) if any text needed. This is PURE KOREAN ART.'
+  3) Then: 'Korean [style name] painting in authentic Joseon Dynasty style...' with all style characteristics
+  4) End with: 'Korean traditional painting, NOT Japanese art, NO Japanese elements whatsoever.'"
 }
 
 CRITICAL: selected_artist MUST be exactly "Korean Minhwa", "Korean Pungsokdo", or "Korean Jingyeong" - no other variations allowed.
