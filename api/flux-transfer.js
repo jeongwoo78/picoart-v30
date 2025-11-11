@@ -563,11 +563,9 @@ export default async function handler(req, res) {
     });
     
     // ========== v30: AI 선택 정보를 첫 응답에 명확히 포함 ==========
-    // 프론트엔드가 이 정보를 저장해서 나중에 사용함
     res.status(200).json({
       id: data.id,
       status: data.status,
-      // ✅ AI 선택 정보 (반드시 포함!)
       selected_artist: selectedArtist,
       selection_method: selectionMethod,
       selection_details: selectionDetails
