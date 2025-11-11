@@ -101,12 +101,12 @@ const fallbackPrompts = {
   // ========================================
   korean: {
     name: '한국 전통화',
-    prompt: 'Korean traditional painting in authentic Joseon Dynasty style. CRITICAL INSTRUCTIONS: 1) GENDER PRESERVATION - carefully preserve exact gender and facial features from original photo (male stays male with masculine face, female stays female with feminine features), 2) Choose appropriate Korean style based on photo subject (Minhwa folk art for animals/flowers with bold outlines and bright Obangsaek colors, Pungsokdo genre painting for people/daily life with refined brushwork, Jingyeong landscape for nature/mountains with expressive ink), 3) Use Korean aesthetic sensibility. ABSOLUTELY NO Japanese hiragana (ひらがな) or katakana (カタカナ). This is PURE KOREAN ART, not Japanese ukiyo-e.'
+    prompt: 'Korean traditional painting in authentic Joseon Dynasty style. CRITICAL INSTRUCTIONS: 1) GENDER PRESERVATION - carefully preserve exact gender and facial features from original photo (male stays male with masculine face, female stays female with feminine features), 2) Choose appropriate Korean style based on photo subject (Minhwa folk art for animals/flowers with bold outlines and bright Obangsaek colors, Pungsokdo genre painting for people/daily life with refined brushwork, Jingyeong landscape for nature/mountains with expressive ink), 3) Use Korean aesthetic sensibility. ABSOLUTELY NO Japanese hiragana (ひらがな) or katakana (カタカナ). NO Japanese calligraphy style. Use ONLY traditional Korean calligraphy. This is PURE KOREAN ART, not Japanese ukiyo-e.'
   },
   
   chinese: {
     name: '중국 전통화',
-    prompt: 'Chinese traditional painting in authentic classical style. CRITICAL INSTRUCTIONS: 1) GENDER PRESERVATION - carefully preserve exact gender and facial features from original photo (male stays male with masculine face, female stays female with feminine features), 2) Choose appropriate Chinese style based on photo subject (Shuimohua ink wash for landscapes/nature with monochrome gradations, Gongbi meticulous painting for people/portraits with fine detailed brushwork and rich colors, Huaniao bird-and-flower for animals/plants with precise naturalistic rendering), 3) Use Chinese aesthetic principles. ABSOLUTELY NO Japanese hiragana (ひらがな) or katakana (カタカナ). ONLY CHINESE CHARACTERS (漢字/汉字) allowed. This is PURE CHINESE ART with CHINESE CHARACTERS ONLY.'
+    prompt: 'Chinese traditional painting in authentic classical style. CRITICAL INSTRUCTIONS: 1) GENDER PRESERVATION - carefully preserve exact gender and facial features from original photo (male stays male with masculine face, female stays female with feminine features), 2) Choose appropriate Chinese style based on photo subject (Shuimohua ink wash for landscapes/nature with monochrome gradations, Gongbi meticulous painting for people/portraits with fine detailed brushwork and rich colors, Huaniao bird-and-flower for animals/plants with precise naturalistic rendering), 3) Use Chinese aesthetic principles. ABSOLUTELY NO Japanese hiragana (ひらがな) or katakana (カタカナ). NO Japanese calligraphy style. ONLY CHINESE CHARACTERS (漢字/汉字) and traditional Chinese calligraphy allowed. This is PURE CHINESE ART with CHINESE CHARACTERS ONLY.'
   },
   
   japanese: {
@@ -200,6 +200,8 @@ CRITICAL INSTRUCTIONS FOR PROMPT GENERATION:
 2. JAPANESE TEXT PROHIBITION (CRITICAL):
    - ABSOLUTELY NO Japanese hiragana (ひらがな) - NEVER ALLOWED
    - ABSOLUTELY NO Japanese katakana (カタカナ) - NEVER ALLOWED
+   - NO Japanese calligraphy style or Japanese text elements whatsoever
+   - Use ONLY traditional Korean calligraphy and Korean Hanja (한자)
    - Any Japanese text = COMPLETE FAILURE
    - This is KOREAN ART, not Japanese art
 
@@ -209,7 +211,7 @@ Return ONLY valid JSON (no markdown):
   "selected_artist": "Korean Minhwa" or "Korean Pungsokdo" or "Korean Jingyeong Landscape",
   "selected_style": "minhwa" or "pungsokdo" or "landscape",
   "reason": "why this style fits (1 sentence)",
-  "prompt": "Complete FLUX prompt starting with GENDER RULE if person present, then 'Korean [style name]...' with all characteristics. MUST include 'ABSOLUTELY NO Japanese hiragana (ひらがな) or katakana (カタカナ), this is PURE KOREAN ART' at the end."
+  "prompt": "Complete FLUX prompt starting with GENDER RULE if person present, then 'Korean [style name]...' with all characteristics. MUST include 'ABSOLUTELY NO Japanese hiragana (ひらがな) or katakana (カタカナ), NO Japanese calligraphy, use ONLY Korean traditional calligraphy, this is PURE KOREAN ART' at the end."
 }
 
 Keep it concise and accurate.`;
@@ -249,6 +251,8 @@ CRITICAL INSTRUCTIONS FOR PROMPT GENERATION:
    - ABSOLUTELY NO Japanese hiragana (ひらがな) - NEVER ALLOWED
    - ABSOLUTELY NO Japanese katakana (カタカナ) - NEVER ALLOWED
    - ONLY CHINESE CHARACTERS (漢字/汉字) ALLOWED - NO Japanese kana whatsoever
+   - NO Japanese calligraphy style or Japanese text elements whatsoever
+   - Use ONLY traditional Chinese calligraphy
    - Any Japanese text = COMPLETE FAILURE
    - This is CHINESE ART with CHINESE CHARACTERS ONLY, not Japanese art
 
@@ -258,7 +262,7 @@ Return ONLY valid JSON (no markdown):
   "selected_artist": "Chinese Ink Wash" or "Chinese Gongbi" or "Chinese Huaniao",
   "selected_style": "ink_wash" or "gongbi" or "huaniao",
   "reason": "why this style fits (1 sentence)",
-  "prompt": "Complete FLUX prompt starting with GENDER RULE if person present, then 'Chinese [style name]...' with all characteristics. MUST include 'ABSOLUTELY NO Japanese hiragana (ひらがな) or katakana (カタカナ), ONLY CHINESE CHARACTERS (漢字) allowed, this is PURE CHINESE ART' at the end."
+  "prompt": "Complete FLUX prompt starting with GENDER RULE if person present, then 'Chinese [style name]...' with all characteristics. MUST include 'ABSOLUTELY NO Japanese hiragana (ひらがな) or katakana (カタカナ), NO Japanese calligraphy, ONLY CHINESE CHARACTERS (漢字) and traditional Chinese calligraphy allowed, this is PURE CHINESE ART' at the end."
 }
 
 Keep it concise and accurate.`;
