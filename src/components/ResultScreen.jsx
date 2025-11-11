@@ -121,13 +121,21 @@ const ResultScreen = ({
             || orientalEducation.korean?.description;
       } 
       
-      // 진경산수화 (기본값 + jingyeong 키워드)
-      else {
-        console.log('✅ DEFAULT: Korean True-View Landscape (진경산수화)');
+      // 진경산수화
+      else if (genre.includes('jingyeong') || genre.includes('진경') || genre.includes('landscape')) {
+        console.log('✅ MATCH: Korean True-View Landscape (진경산수화)');
         console.log('========================================');
         console.log('');
         return orientalEducation.korean_jingyeong?.description 
-            || orientalEducation.korean?.description;
+            || orientalEducation.korean_default?.description;
+      }
+      
+      // 기본값 (매칭 실패시)
+      else {
+        console.log('⚠️ DEFAULT: Korean Traditional Painting (한국 전통 회화)');
+        console.log('========================================');
+        console.log('');
+        return orientalEducation.korean_default?.description;
       }
     }
     
@@ -154,15 +162,24 @@ const ResultScreen = ({
         console.log('========================================');
         console.log('');
         return orientalEducation.chinese_huaniao?.description 
-            || orientalEducation.chinese_ink?.description;
+            || orientalEducation.chinese_default?.description;
       }
       
-      // 수묵화 (기본값)
-      else {
-        console.log('✅ DEFAULT: Chinese Ink Wash (水墨畫)');
+      // 수묵화
+      else if (artist.includes('ink') || artist.includes('수묵') || artist.includes('wash')) {
+        console.log('✅ MATCH: Chinese Ink Wash (水墨畫)');
         console.log('========================================');
         console.log('');
-        return orientalEducation.chinese_ink?.description;
+        return orientalEducation.chinese_ink?.description 
+            || orientalEducation.chinese_default?.description;
+      }
+      
+      // 기본값 (매칭 실패시)
+      else {
+        console.log('⚠️ DEFAULT: Chinese Traditional Painting (중국 전통 회화)');
+        console.log('========================================');
+        console.log('');
+        return orientalEducation.chinese_default?.description;
       }
     }
     
@@ -174,7 +191,7 @@ const ResultScreen = ({
       console.log('========================================');
       console.log('');
       return orientalEducation.japanese_ukiyoe?.description 
-          || orientalEducation.japanese?.description;
+          || orientalEducation.japanese_default?.description;
     }
     
     

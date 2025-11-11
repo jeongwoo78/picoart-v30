@@ -23,6 +23,30 @@ export const orientalOverview = {
 // ========== 2차 교육: 장르별 상세 설명 (AI 자동 선택용) ==========
 export const orientalEducation = {
   
+  // ========== 기본값 (매칭 실패시) ==========
+  
+  korean_default: {
+    name: '한국 전통 회화',
+    description: `이 작품에는 한국 전통 회화 방식이 적용되었습니다.
+
+한국 전통 회화의 여백의 미와 절제된 표현 기법으로 새롭게 해석되었습니다.`
+  },
+  
+  chinese_default: {
+    name: '중국 전통 회화',
+    description: `이 작품에는 중국 전통 회화 방식이 적용되었습니다.
+
+중국 전통 회화의 기운생동과 조화로운 표현 기법으로 새롭게 해석되었습니다.`
+  },
+  
+  japanese_default: {
+    name: '일본 전통 회화',
+    description: `이 작품에는 일본 전통 회화 방식이 적용되었습니다.
+
+일본 전통 회화의 섬세한 관찰과 대담한 표현 기법으로 새롭게 해석되었습니다.`
+  },
+  
+  
   // ========== 한국 (3개) ==========
   
   korean_jingyeong: {

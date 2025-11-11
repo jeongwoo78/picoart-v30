@@ -101,14 +101,14 @@ const fallbackPrompts = {
   // ========================================
   korean: {
     name: '한국 전통화',
-    artist: 'Korean Jingyeong',  // fallback 기본값 (영어)
-    prompt: 'Korean traditional painting in authentic Joseon Dynasty style. CRITICAL INSTRUCTIONS: 1) GENDER PRESERVATION - carefully preserve exact gender and facial features from original photo (male stays male with masculine face, female stays female with feminine features), 2) Choose appropriate Korean style based on photo subject (Minhwa folk art for animals/flowers with bold outlines and bright Obangsaek colors, Pungsokdo genre painting for people/daily life with refined brushwork, Jingyeong landscape for nature/mountains with expressive ink), 3) Use Korean aesthetic sensibility. ABSOLUTELY NO Japanese hiragana (ひらがな) or katakana (カタカナ). NO Japanese calligraphy style. Use ONLY traditional Korean calligraphy. This is PURE KOREAN ART, not Japanese ukiyo-e.'
+    artist: 'Korean Pungsokdo',  // v32: Jingyeong → Pungsokdo (사람 사진 더 많음)
+    prompt: 'Korean traditional genre painting (Pungsokdo, 풍속화) in authentic Joseon Dynasty style with REFINED DELICATE BRUSHWORK. Paint elegant figures in graceful composition using SOFT PASTEL WATERCOLORS and GENTLE INK TONES ONLY. Create narrative atmosphere of traditional Korean daily life with SUBTLE SOPHISTICATED colors. CRITICAL PROHIBITION: This is NOT Minhwa folk art - do NOT use thick black outlines, do NOT use bright primary colors (red/blue/yellow blocks), do NOT use flat naive style, do NOT use childlike aesthetic. ONLY use refined court painting technique with delicate lines and muted elegant tones. ABSOLUTELY NO Japanese hiragana (ひらがな) or katakana (カタカナ). This is sophisticated Korean genre painting, NOT folk art.'
   },
   
   chinese: {
     name: '중국 전통화',
-    artist: 'Chinese Ink Wash',  // fallback 기본값 (영어)
-    prompt: 'Chinese traditional painting in authentic classical style. CRITICAL INSTRUCTIONS: 1) GENDER PRESERVATION - carefully preserve exact gender and facial features from original photo (male stays male with masculine face, female stays female with feminine features), 2) Choose appropriate Chinese style based on photo subject (Shuimohua ink wash for landscapes/nature with monochrome gradations, Gongbi meticulous painting for people/portraits with fine detailed brushwork and rich colors, Huaniao bird-and-flower for animals/plants with precise naturalistic rendering), 3) Use Chinese aesthetic principles. ABSOLUTELY NO Japanese hiragana (ひらがな) or katakana (カタカナ). NO Japanese calligraphy style. ONLY CHINESE CHARACTERS (漢字/汉字) and traditional Chinese calligraphy allowed. This is PURE CHINESE ART with CHINESE CHARACTERS ONLY.'
+    artist: 'Chinese Gongbi',  // v32: Ink Wash → Gongbi (사람 사진 더 많음)
+    prompt: 'Chinese traditional Gongbi meticulous painting (工筆畫) in authentic classical style. CRITICAL INSTRUCTIONS: 1) GENDER PRESERVATION - carefully preserve exact gender and facial features from original photo (male stays male with masculine face, female stays female with feminine features), 2) Use extremely fine detailed brushwork, delicate precise lines, rich mineral pigments with refined colors, elegant decorative quality, imperial court painting style. 3) ABSOLUTELY NO Japanese hiragana (ひらがな) or katakana (カタカナ). NO Japanese calligraphy style. ONLY CHINESE CHARACTERS (漢字/汉字) and traditional Chinese calligraphy allowed. This is PURE CHINESE ART with CHINESE CHARACTERS ONLY.'
   },
   
   japanese: {
@@ -176,19 +176,25 @@ Keep it concise and accurate.`;
 You must choose ONE of these THREE styles:
 
 Style 1: Korean Minhwa Folk Painting (민화)
-- Best for: animals (tiger, magpie, fish), flowers (peony), birds, simple subjects
+- Best for: animals (tiger, magpie, fish), flowers (peony), birds, simple subjects WITHOUT people
 - Characteristics: THICK BLACK OUTLINES around all shapes, BRIGHT primary colors (Obangsaek: red/blue/yellow/white/black), completely FLAT naive composition, childlike playful aesthetic
-- When: Photo has animals, flowers, or needs cheerful colorful treatment
+- When: Photo has animals, flowers, or needs cheerful colorful treatment, BUT NO PEOPLE
 
-Style 2: Korean Pungsokdo Genre Painting (풍속도)
-- Best for: people, portraits, daily life, couples, festivals, human activities
+Style 2: Korean Pungsokdo Genre Painting (풍속도) ⭐ DEFAULT FOR PEOPLE
+- Best for: ANY photo with PEOPLE, portraits, faces, human subjects, daily life, couples, festivals
 - Characteristics: Refined delicate brushwork, figures in hanbok, soft pastel colors, narrative storytelling of Joseon life, elegant composition
-- When: Photo has people, faces, human subjects
+- When: Photo has ANY people, faces, human subjects → ALWAYS CHOOSE THIS
+- CRITICAL: If you see a PERSON in the photo, you MUST select Pungsokdo (풍속도)
 
 Style 3: Korean Jingyeong Landscape (진경산수)
-- Best for: mountains, nature, rocks, landscapes, scenery
+- Best for: mountains, nature, rocks, landscapes, scenery WITHOUT people
 - Characteristics: Bold expressive brushwork, dramatic angular forms, monochrome ink with strong contrasts, REAL Korean scenery (not idealized Chinese mountains)
-- When: Photo has natural landscapes, mountains, rocks
+- When: Photo has natural landscapes, mountains, rocks, BUT NO PEOPLE
+
+SELECTION RULE:
+- Person/face/people in photo? → ALWAYS Korean Pungsokdo
+- Animals/flowers only? → Korean Minhwa
+- Pure landscape/mountains/nature? → Korean Jingyeong
 
 Analyze the photo and choose the MOST suitable style.
 
@@ -447,7 +453,7 @@ export default async function handler(req, res) {
       const aiResult = await selectArtistWithAI(
         image, 
         selectedStyle,  // ← selectedStyle 객체 전체 전달
-        8000 // 8초 타임아웃
+        15000 // 15초 타임아웃 (v32: 8초→15초 증가)
       );
       
       if (aiResult.success) {
