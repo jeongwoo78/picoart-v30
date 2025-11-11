@@ -1,10 +1,29 @@
-// PicoArt v29 - SIMPLIFIED ARCHITECTURE
-// Removed 19-artwork DB, Claude still selects style from 2-3 options per culture
-// v29: 19개 작품 DB 제거 → Claude가 2-3개 주요 스타일 중 선택
-// 한국: 민화/풍속도/산수화, 중국: 수묵화/공필화/화조화
-
+// PicoArt v33 - Art Movements Refined
+// v33: 미술사조 10개 확정 + 거장 6명 시간순 정렬
+//
+// 미술사조 10개 (시간순):
+//   1. 고대 그리스-로마 (BC 800~AD 400)
+//   2. 비잔틴·이슬람 (4~15세기)
+//   3. 르네상스 (1400~1600)
+//   4. 바로크 (1600~1750)
+//   5. 신고전주의 (1770~1840) ⭐ NEW
+//   6. 낭만주의 (1800~1850)
+//   7. 사실주의 (1840~1870) ⭐ NEW
+//   8. 인상주의 (1860~1890)
+//   9. 후기인상주의 (1880~1910)
+//  10. 표현주의 (1905~1920)
+//
+// 제외: 로코코 (대중성 낮음), 야수파 (마티스로 보완)
+//
+// 거장 6명 (시간순 + 생사연도):
+//   1. 반 고흐 (1853-1890, 후기인상주의)
+//   2. 클림트 (1862-1918, 아르누보)
+//   3. 마티스 (1869-1954, 야수파)
+//   4. 뭉크 (1863-1944, 표현주의)
+//   5. 피카소 (1881-1973, 입체주의)
+//   6. 달리 (1904-1989, 초현실주의)
+//
 // ========================================
-// v29: NO ARTWORK DATABASE FILES
 // Claude AI selects style (Minhwa/Pungsokdo/Gongbi/etc)
 // FLUX renders with selected style
 // ========================================
@@ -31,9 +50,9 @@ const fallbackPrompts = {
     prompt: 'Baroque painting style, dramatic chiaroscuro lighting, rich deep colors, dynamic diagonal composition, theatrical emotional atmosphere, strong contrast between light and shadow, painted in Baroque masterpiece quality'
   },
   
-  rococo: {
-    name: '로코코',
-    prompt: 'Rococo painting style, light pastel colors, playful ornate decoration, soft delicate brushwork, romantic elegant atmosphere, graceful curved lines, whimsical charm, painted in Rococo masterpiece quality'
+  neoclassicism: {
+    name: '신고전주의',
+    prompt: 'Neoclassical painting style, clean precise lines, smooth marble-like surfaces, idealized classical forms, balanced symmetrical composition, clear rational structure, heroic noble subjects, muted dignified colors, inspired by ancient Greek and Roman art, painted in Neoclassical masterpiece quality by Jacques-Louis David'
   },
   
   romanticism: {
@@ -41,14 +60,14 @@ const fallbackPrompts = {
     prompt: 'Romantic painting style, dramatic emotional intensity, sublime natural beauty, vivid expressive colors, dynamic turbulent composition, passionate atmosphere, painted in Romantic masterpiece quality'
   },
   
+  realism: {
+    name: '사실주의',
+    prompt: 'Realist painting style, honest unidealized depiction of everyday life, working class and peasant subjects, earthy natural colors, solid three-dimensional forms, direct observation of reality, social commentary, dignified portrayal of common people, painted in Realist masterpiece quality by Gustave Courbet or Jean-François Millet'
+  },
+  
   impressionism: {
     name: '인상주의',
     prompt: 'Impressionist painting style, visible short brushstrokes, pure unmixed colors, emphasis on natural light effects, outdoor plein-air atmosphere, capturing fleeting moments, painted in Impressionist masterpiece quality'
-  },
-  
-  post_impressionism: {
-    name: '후기인상주의',
-    prompt: 'Post-Impressionist painting style, bold expressive colors, geometric structured forms, emotional symbolic content, innovative personal vision, painted in Post-Impressionist masterpiece quality'
   },
   
   postImpressionism: {
@@ -56,43 +75,54 @@ const fallbackPrompts = {
     prompt: 'Post-Impressionist painting style, bold expressive colors, geometric structured forms, emotional symbolic content, innovative personal vision, painted in Post-Impressionist masterpiece quality'
   },
   
-  fauvism: {
-    name: '야수파',
-    prompt: 'Fauvist painting style, wild pure vivid colors, bold simplified forms, strong non-naturalistic palette, flat decorative patterns, expressive emotional intensity, painted in Fauvist masterpiece quality'
-  },
-  
   expressionism: {
     name: '표현주의',
     prompt: 'Expressionist painting style, intense emotional colors, distorted exaggerated forms, psychological depth, dramatic angular composition, inner feelings externalized, painted in Expressionist masterpiece quality'
   },
   
-  klimt: {
-    name: '클림트',
-    prompt: 'painting by Gustav Klimt, golden ornamental patterns, Byzantine mosaic influence, decorative symbolic style, sensuous flowing forms, jewel-like colors, Art Nouveau elegance'
-  },
-  
-  picasso: {
-    name: '피카소',
-    prompt: 'Cubist painting by Pablo Picasso, geometric fragmented forms, multiple simultaneous perspectives, abstract analytical composition, monochromatic or limited palette'
-  },
+  // ========================================
+  // 거장 6명 (시간순 정렬 + 생사연도)
+  // ========================================
   
   van_gogh: {
     name: '반 고흐',
+    artist: 'Vincent van Gogh (1853-1890)',
+    movement: '후기인상주의 (Post-Impressionism)',
     prompt: 'painting by Vincent van Gogh, thick expressive swirling brushstrokes, vibrant intense emotional colors, dynamic energetic composition, passionate turbulent style'
   },
   
-  matisse: {
-    name: '마티스',
-    prompt: 'painting by Henri Matisse, bold pure flat colors, simplified harmonious forms, decorative rhythmic patterns, joyful life-affirming atmosphere'
+  klimt: {
+    name: '클림트',
+    artist: 'Gustav Klimt (1862-1918)',
+    movement: '아르누보 (Art Nouveau)',
+    prompt: 'painting by Gustav Klimt, golden ornamental patterns, Byzantine mosaic influence, decorative symbolic style, sensuous flowing forms, jewel-like colors, Art Nouveau elegance'
   },
   
   munch: {
     name: '뭉크',
+    artist: 'Edvard Munch (1863-1944)',
+    movement: '표현주의 (Expressionism)',
     prompt: 'painting by Edvard Munch, intense emotional psychological depth, symbolic expressive colors, haunting atmospheric mood, existential anxiety visualized'
+  },
+  
+  matisse: {
+    name: '마티스',
+    artist: 'Henri Matisse (1869-1954)',
+    movement: '야수파 (Fauvism)',
+    prompt: 'painting by Henri Matisse, bold pure flat colors, simplified harmonious forms, decorative rhythmic patterns, joyful life-affirming atmosphere'
+  },
+  
+  picasso: {
+    name: '피카소',
+    artist: 'Pablo Picasso (1881-1973)',
+    movement: '입체주의 (Cubism)',
+    prompt: 'Cubist painting by Pablo Picasso, geometric fragmented forms, multiple simultaneous perspectives, abstract analytical composition, monochromatic or limited palette'
   },
   
   dali: {
     name: '달리',
+    artist: 'Salvador Dalí (1904-1989)',
+    movement: '초현실주의 (Surrealism)',
     prompt: 'Surrealist painting by Salvador Dalí, dreamlike hyperrealistic details, melting distorted forms, bizarre juxtapositions, subconscious imagery, precise meticulous technique'
   },
   
@@ -101,14 +131,12 @@ const fallbackPrompts = {
   // ========================================
   korean: {
     name: '한국 전통화',
-    artist: 'Korean Pungsokdo',  // v32: Jingyeong → Pungsokdo (사람 사진 더 많음)
-    prompt: 'Korean traditional genre painting (Pungsokdo, 풍속화) in authentic Joseon Dynasty style with REFINED DELICATE BRUSHWORK. Paint elegant figures in graceful composition using SOFT PASTEL WATERCOLORS and GENTLE INK TONES ONLY. Create narrative atmosphere of traditional Korean daily life with SUBTLE SOPHISTICATED colors. CRITICAL PROHIBITION: This is NOT Minhwa folk art - do NOT use thick black outlines, do NOT use bright primary colors (red/blue/yellow blocks), do NOT use flat naive style, do NOT use childlike aesthetic. ONLY use refined court painting technique with delicate lines and muted elegant tones. ABSOLUTELY NO Japanese hiragana (ひらがな) or katakana (カタカナ). This is sophisticated Korean genre painting, NOT folk art.'
+    prompt: 'Korean traditional painting in authentic Joseon Dynasty style. CRITICAL INSTRUCTIONS: 1) GENDER PRESERVATION - carefully preserve exact gender and facial features from original photo (male stays male with masculine face, female stays female with feminine features), 2) Choose appropriate Korean style based on photo subject (Minhwa folk art for animals/flowers with bold outlines and bright Obangsaek colors, Pungsokdo genre painting for people/daily life with refined brushwork, Jingyeong landscape for nature/mountains with expressive ink), 3) Use Korean aesthetic sensibility. ABSOLUTELY NO Japanese hiragana (ひらがな) or katakana (カタカナ). This is PURE KOREAN ART, not Japanese ukiyo-e.'
   },
   
   chinese: {
     name: '중국 전통화',
-    artist: 'Chinese Gongbi',  // v32: Ink Wash → Gongbi (사람 사진 더 많음)
-    prompt: 'Chinese traditional Gongbi meticulous painting (工筆畫) in authentic classical style. CRITICAL INSTRUCTIONS: 1) GENDER PRESERVATION - carefully preserve exact gender and facial features from original photo (male stays male with masculine face, female stays female with feminine features), 2) Use extremely fine detailed brushwork, delicate precise lines, rich mineral pigments with refined colors, elegant decorative quality, imperial court painting style. 3) ABSOLUTELY NO Japanese hiragana (ひらがな) or katakana (カタカナ). NO Japanese calligraphy style. ONLY CHINESE CHARACTERS (漢字/汉字) and traditional Chinese calligraphy allowed. This is PURE CHINESE ART with CHINESE CHARACTERS ONLY.'
+    prompt: 'Chinese traditional painting in authentic classical style. CRITICAL INSTRUCTIONS: 1) GENDER PRESERVATION - carefully preserve exact gender and facial features from original photo (male stays male with masculine face, female stays female with feminine features), 2) Choose appropriate Chinese style based on photo subject (Shuimohua ink wash for landscapes/nature with monochrome gradations, Gongbi meticulous painting for people/portraits with fine detailed brushwork and rich colors, Huaniao bird-and-flower for animals/plants with precise naturalistic rendering), 3) Use Chinese aesthetic principles. ABSOLUTELY NO Japanese hiragana (ひらがな) or katakana (カタカナ). This is PURE CHINESE ART.'
   },
   
   japanese: {
@@ -176,32 +204,21 @@ Keep it concise and accurate.`;
 You must choose ONE of these THREE styles:
 
 Style 1: Korean Minhwa Folk Painting (민화)
-- Best for: animals (tiger, magpie, fish), flowers (peony), birds, buildings, architecture, man-made objects, simple subjects
+- Best for: animals (tiger, magpie, fish), flowers (peony), birds, simple subjects
 - Characteristics: THICK BLACK OUTLINES around all shapes, BRIGHT primary colors (Obangsaek: red/blue/yellow/white/black), completely FLAT naive composition, childlike playful aesthetic
-- When: Photo has animals, flowers, buildings, architecture, man-made structures, or needs cheerful colorful treatment
+- When: Photo has animals, flowers, or needs cheerful colorful treatment
 
-Style 2: Korean Pungsokdo Genre Painting (풍속도) ⭐ DEFAULT FOR PEOPLE
-- Best for: ANY photo with PEOPLE, portraits, faces, human subjects, daily life, couples, festivals
+Style 2: Korean Pungsokdo Genre Painting (풍속도)
+- Best for: people, portraits, daily life, couples, festivals, human activities
 - Characteristics: Refined delicate brushwork, figures in hanbok, soft pastel colors, narrative storytelling of Joseon life, elegant composition
-- When: Photo has ANY people, faces, human subjects → ALWAYS CHOOSE THIS
-- CRITICAL: If you see a PERSON in the photo, you MUST select Pungsokdo (풍속도)
+- When: Photo has people, faces, human subjects
 
 Style 3: Korean Jingyeong Landscape (진경산수)
 - Best for: mountains, nature, rocks, landscapes, scenery
 - Characteristics: Bold expressive brushwork, dramatic angular forms, monochrome ink with strong contrasts, REAL Korean scenery (not idealized Chinese mountains)
 - When: Photo has natural landscapes, mountains, rocks
 
-SELECTION RULE - Analyze what is the MAIN SUBJECT of the photo:
-- Main subject is PERSON (large, centered, portrait) → Korean Pungsokdo
-- Main subject is BUILDING/ARCHITECTURE (with small or no people) → Korean Minhwa
-- Main subject is ANIMAL/FLOWER (with small or no people) → Korean Minhwa
-- Main subject is NATURAL LANDSCAPE/MOUNTAINS (with small or no people) → Korean Jingyeong
-
-If person is the dominant element → Pungsokdo
-If building/object/animal/flower is dominant → Minhwa
-If natural scenery is dominant → Jingyeong
-
-Analyze the photo and choose based on the MAIN SUBJECT.
+Analyze the photo and choose the MOST suitable style.
 
 CRITICAL INSTRUCTIONS FOR PROMPT GENERATION:
 1. GENDER PRESERVATION (MANDATORY IN PROMPT):
@@ -213,25 +230,17 @@ CRITICAL INSTRUCTIONS FOR PROMPT GENERATION:
 2. JAPANESE TEXT PROHIBITION (CRITICAL):
    - ABSOLUTELY NO Japanese hiragana (ひらがな) - NEVER ALLOWED
    - ABSOLUTELY NO Japanese katakana (カタカナ) - NEVER ALLOWED
-   - NO Japanese calligraphy style or Japanese text elements whatsoever
-   - Use ONLY traditional Korean calligraphy and Korean Hanja (한자)
    - Any Japanese text = COMPLETE FAILURE
    - This is KOREAN ART, not Japanese art
 
-Return ONLY valid JSON in ENGLISH (no markdown, no Korean):
+Return ONLY valid JSON (no markdown):
 {
   "analysis": "brief photo description including gender if person present (1 sentence)",
-  "selected_artist": "Korean Minhwa" OR "Korean Pungsokdo" OR "Korean Jingyeong" (MUST be exactly one of these three, IN ENGLISH),
-  "selected_style": "minhwa" OR "pungsokdo" OR "jingyeong",
+  "selected_artist": "Korean Minhwa" or "Korean Pungsokdo" or "Korean Jingyeong Landscape",
+  "selected_style": "minhwa" or "pungsokdo" or "landscape",
   "reason": "why this style fits (1 sentence)",
-  "prompt": "Complete FLUX prompt with this EXACT structure: 
-  1) Start with GENDER RULE if person present
-  2) Then: 'CRITICAL: ABSOLUTELY NO Japanese text - NO hiragana (ひらがな), NO katakana (カタカナ), NO Japanese kanji, NO Japanese calligraphy style. Use ONLY Korean Hanja (漢字) if any text needed. This is PURE KOREAN ART.'
-  3) Then: 'Korean [style name] painting in authentic Joseon Dynasty style...' with all style characteristics
-  4) End with: 'Korean traditional painting, NOT Japanese art, NO Japanese elements whatsoever.'"
+  "prompt": "Complete FLUX prompt starting with GENDER RULE if person present, then 'Korean [style name]...' with all characteristics. MUST include 'ABSOLUTELY NO Japanese hiragana (ひらがな) or katakana (カタカナ), this is PURE KOREAN ART' at the end."
 }
-
-CRITICAL: selected_artist MUST be exactly "Korean Minhwa", "Korean Pungsokdo", or "Korean Jingyeong" - no other variations allowed.
 
 Keep it concise and accurate.`;
       }
@@ -269,22 +278,17 @@ CRITICAL INSTRUCTIONS FOR PROMPT GENERATION:
 2. JAPANESE TEXT PROHIBITION (CRITICAL):
    - ABSOLUTELY NO Japanese hiragana (ひらがな) - NEVER ALLOWED
    - ABSOLUTELY NO Japanese katakana (カタカナ) - NEVER ALLOWED
-   - ONLY CHINESE CHARACTERS (漢字/汉字) ALLOWED - NO Japanese kana whatsoever
-   - NO Japanese calligraphy style or Japanese text elements whatsoever
-   - Use ONLY traditional Chinese calligraphy
    - Any Japanese text = COMPLETE FAILURE
-   - This is CHINESE ART with CHINESE CHARACTERS ONLY, not Japanese art
+   - This is CHINESE ART, not Japanese art
 
-Return ONLY valid JSON in ENGLISH (no markdown, no Chinese):
+Return ONLY valid JSON (no markdown):
 {
   "analysis": "brief photo description including gender if person present (1 sentence)",
-  "selected_artist": "Chinese Ink Wash" OR "Chinese Gongbi" OR "Chinese Huaniao" (MUST be exactly one of these three, IN ENGLISH),
-  "selected_style": "ink_wash" OR "gongbi" OR "huaniao",
+  "selected_artist": "Chinese Ink Wash" or "Chinese Gongbi" or "Chinese Huaniao",
+  "selected_style": "ink_wash" or "gongbi" or "huaniao",
   "reason": "why this style fits (1 sentence)",
-  "prompt": "Complete FLUX prompt starting with GENDER RULE if person present, then 'Chinese [style name]...' with all characteristics. MUST include 'ABSOLUTELY NO Japanese hiragana (ひらがな) or katakana (カタカナ), NO Japanese calligraphy, ONLY CHINESE CHARACTERS (漢字) and traditional Chinese calligraphy allowed, this is PURE CHINESE ART' at the end."
+  "prompt": "Complete FLUX prompt starting with GENDER RULE if person present, then 'Chinese [style name]...' with all characteristics. MUST include 'ABSOLUTELY NO Japanese hiragana (ひらがな) or katakana (カタカナ), this is PURE CHINESE ART' at the end."
 }
-
-CRITICAL: selected_artist MUST be exactly "Chinese Ink Wash", "Chinese Gongbi", or "Chinese Huaniao" - no other variations allowed.
 
 Keep it concise and accurate.`;
       }
@@ -462,7 +466,7 @@ export default async function handler(req, res) {
       const aiResult = await selectArtistWithAI(
         image, 
         selectedStyle,  // ← selectedStyle 객체 전체 전달
-        15000 // 15초 타임아웃 (v32: 8초→15초 증가)
+        8000 // 8초 타임아웃
       );
       
       if (aiResult.success) {
@@ -505,7 +509,7 @@ export default async function handler(req, res) {
         }
         
         finalPrompt = fallback.prompt;
-        selectedArtist = fallback.artist || fallback.name;  // artist 우선, 없으면 name
+        selectedArtist = fallback.name;
         selectionMethod = 'fallback';
         selectionDetails = {
           ai_error: aiResult.error
@@ -541,7 +545,7 @@ export default async function handler(req, res) {
       }
       
       finalPrompt = fallback.prompt;
-      selectedArtist = fallback.artist || fallback.name;  // artist 우선, 없으면 name
+      selectedArtist = fallback.name;
       selectionMethod = 'fallback_no_key';
     }
 
