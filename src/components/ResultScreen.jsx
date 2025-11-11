@@ -113,7 +113,7 @@ const ResultScreen = ({
       } 
       
       // 풍속화
-      else if (genre.includes('genre') || genre.includes('풍속')) {
+      else if (genre.includes('genre') || genre.includes('풍속') || genre.includes('pungsokdo') || genre.includes('풍속도')) {
         console.log('✅ MATCH: Korean Genre Painting (풍속화)');
         console.log('========================================');
         console.log('');
