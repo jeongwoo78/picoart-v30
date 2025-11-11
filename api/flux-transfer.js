@@ -101,11 +101,13 @@ const fallbackPrompts = {
   // ========================================
   korean: {
     name: '한국 전통화',
+    artist: 'Korean Jingyeong',  // fallback 기본값 (영어)
     prompt: 'Korean traditional painting in authentic Joseon Dynasty style. CRITICAL INSTRUCTIONS: 1) GENDER PRESERVATION - carefully preserve exact gender and facial features from original photo (male stays male with masculine face, female stays female with feminine features), 2) Choose appropriate Korean style based on photo subject (Minhwa folk art for animals/flowers with bold outlines and bright Obangsaek colors, Pungsokdo genre painting for people/daily life with refined brushwork, Jingyeong landscape for nature/mountains with expressive ink), 3) Use Korean aesthetic sensibility. ABSOLUTELY NO Japanese hiragana (ひらがな) or katakana (カタカナ). NO Japanese calligraphy style. Use ONLY traditional Korean calligraphy. This is PURE KOREAN ART, not Japanese ukiyo-e.'
   },
   
   chinese: {
     name: '중국 전통화',
+    artist: 'Chinese Ink Wash',  // fallback 기본값 (영어)
     prompt: 'Chinese traditional painting in authentic classical style. CRITICAL INSTRUCTIONS: 1) GENDER PRESERVATION - carefully preserve exact gender and facial features from original photo (male stays male with masculine face, female stays female with feminine features), 2) Choose appropriate Chinese style based on photo subject (Shuimohua ink wash for landscapes/nature with monochrome gradations, Gongbi meticulous painting for people/portraits with fine detailed brushwork and rich colors, Huaniao bird-and-flower for animals/plants with precise naturalistic rendering), 3) Use Chinese aesthetic principles. ABSOLUTELY NO Japanese hiragana (ひらがな) or katakana (カタカナ). NO Japanese calligraphy style. ONLY CHINESE CHARACTERS (漢字/汉字) and traditional Chinese calligraphy allowed. This is PURE CHINESE ART with CHINESE CHARACTERS ONLY.'
   },
   
@@ -488,7 +490,7 @@ export default async function handler(req, res) {
         }
         
         finalPrompt = fallback.prompt;
-        selectedArtist = fallback.name;
+        selectedArtist = fallback.artist || fallback.name;  // artist 우선, 없으면 name
         selectionMethod = 'fallback';
         selectionDetails = {
           ai_error: aiResult.error
@@ -524,7 +526,7 @@ export default async function handler(req, res) {
       }
       
       finalPrompt = fallback.prompt;
-      selectedArtist = fallback.name;
+      selectedArtist = fallback.artist || fallback.name;  // artist 우선, 없으면 name
       selectionMethod = 'fallback_no_key';
     }
 
